@@ -31,4 +31,14 @@ class Bangunan extends Model
         'luas' => 'decimal:2',
         'harga' => 'decimal:2',
     ];
+    public function qr_codes()
+    {
+        return $this->hasMany(QrBangunan::class);
+    }
+    public function qrBangunans()
+    {
+        return $this->hasMany(QrBangunan::class, 'bangunan_id');
+    }
+
+
 }

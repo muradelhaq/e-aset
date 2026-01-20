@@ -31,6 +31,8 @@ class BangunanResource extends Resource
     // Mengubah nama di menu navigasi
     protected static ?string $navigationLabel = 'Data Bangunan';
 
+    protected static ?int $navigationSort = 6;
+
     // Mengubah judul halaman (plural & singular)
     protected static ?string $pluralLabel = 'Data Bangunan';
     protected static ?string $modelLabel = 'Bangunan';

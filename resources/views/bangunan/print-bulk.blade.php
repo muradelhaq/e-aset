@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="utf-8">
-<title>Cetak QR - Bulk</title>
+<title>Cetak QR - Bangunan (Bulk)</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 
 <style>
@@ -27,7 +27,6 @@ body{background:#f7fafc;padding:8mm}
 
 /* ===== GRID ===== */
 :root{--cols:2;--rows:4;--gap:8mm}
-
 .grid{
     display:grid;
     grid-template-columns:repeat(var(--cols),1fr);
@@ -88,11 +87,11 @@ body{background:#f7fafc;padding:8mm}
     margin-bottom:4px;
 }
 
-/* ===== INFO LIST (Bukan Tabel) ===== */
+/* ===== INFO LIST (BUKAN TABEL) ===== */
 .item{margin-bottom:2px}
 .item span{
     display:inline-block;
-    width:70px;
+    width:72px;
     font-weight:600;
     color:#4b5563;
 }
@@ -139,7 +138,7 @@ $copies = max(1,(int)request('copies',1));
 
 $cards=[];
 foreach($things as $thing){
-    $qr=$thing->qrElektroniks->first();
+    $qr=$thing->qrBangunans->first();
     for($i=0;$i<$copies;$i++){
         $cards[]=compact('thing','qr');
     }
@@ -177,30 +176,40 @@ $total=count($cards);
             <!-- BODY -->
             <div class="body">
                 <div class="qr">
-                    {!! $qr ? QrCode::size(140)->margin(1)->generate(route('elektronik.show',$qr->kode_qr)) : '' !!}
+                    {!! $qr ? QrCode::size(140)->margin(1)->generate(route('bangunan.show',$qr->kode_qr)) : '' !!}
                 </div>
 
                 <div class="info">
                     <div class="code">{{ $qr->kode_qr ?? '-' }}</div>
 
                     <div class="item">
+                        <span>Kode</span>
+                        <span class="value">{{ $thing->kode_bangunan }}</span>
+                    </div>
+
+                    <div class="item">
                         <span>Nama</span>
-                        <span class="value">{{ $thing->jenis_barang }}</span>
+                        <span class="value">{{ $thing->nama_bangunan }}</span>
                     </div>
 
                     <div class="item">
-                        <span>Merek</span>
-                        <span class="value">{{ $thing->merk }}</span>
+                        <span>Jenis</span>
+                        <span class="value">{{ $thing->jenis_bangunan }}</span>
                     </div>
 
                     <div class="item">
-                        <span>Tipe</span>
-                        <span class="value">{{ $thing->tipe }}</span>
+                        <span>Tahun</span>
+                        <span class="value">{{ $thing->tahun_bangun ?? '-' }}</span>
+                    </div>
+
+                    <div class="item">
+                        <span>Alamat</span>
+                        <span class="value">{{ $thing->alamat }}</span>
                     </div>
 
                     <div class="item">
                         <span>Kondisi</span>
-                        <span class="value upper">{{ $thing->keterangan }}</span>
+                        <span class="value upper">{{ $thing->kondisi }}</span>
                     </div>
 
                     <div class="item">

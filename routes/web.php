@@ -1,11 +1,14 @@
 <?php
 use App\Http\Controllers\KendaraanDetailController;
 use App\Http\Controllers\ElektronikDetailController;
+use App\Http\Controllers\BangunanDetailController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use App\Models\Kendaraan;
+use App\Models\Bangunan;
 use App\Models\Elektronik;
 use App\Models\QrKendaraan;
+use App\Models\QrBangunan;
 use App\Models\QrElektronik;
 use App\Models\NonElektronik;
 use App\Models\QrNonElektronik;
@@ -131,3 +134,49 @@ Route::get('/non-elektronik/print-bulk-debug', function (Request $request) {
 /* ================= PUBLIC SCAN QR ================= */
 Route::get('/non-elektronik/{kode_qr}', [NonElektronikDetailController::class, 'show'])
     ->name('non-elektronik.show');
+
+
+Route::get('/bangunan/print/{kode}', function ($kode) {
+    $qr = QrBangunan::where('kode_qr', $kode)->firstOrFail();
+    $record = $qr->bangunan;
+
+    return view('bangunan.print-qr', compact('qr', 'record'));
+})->name('bangunan.print');
+
+
+/**
+ * Print Bulk QR Bangunan
+ */
+Route::get('/bangunan/print-bulk', function (Request $request) {
+    $codes = array_filter(explode(',', $request->query('codes', '')));
+
+    if (empty($codes)) {
+        abort(400, 'No QR codes provided');
+    }
+
+    $things = Bangunan::whereHas('qrBangunans', function ($q) use ($codes) {
+            $q->whereIn('kode_qr', $codes);
+        })
+        ->with(['qrBangunans' => function ($q) use ($codes) {
+            $q->whereIn('kode_qr', $codes)->latest();
+        }])
+        ->get();
+
+    return view('bangunan.print-bulk', compact('things'));
+})->name('bangunan.print.bulk');
+
+
+/**
+ * Debug Print Bulk Bangunan (opsional)
+ */
+Route::get('/bangunan/print-bulk-debug', function (Request $request) {
+    return response()->json([
+        'ok'        => true,
+        'fullUrl'   => $request->fullUrl(),
+        'codes'     => $request->query('codes'),
+        'autoprint' => $request->query('autoprint'),
+    ]);
+});
+
+Route::get('/bangunan/{kode_qr}', [BangunanDetailController::class, 'show'])
+    ->name('bangunan.show');

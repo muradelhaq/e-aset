@@ -22,13 +22,13 @@ class TanahResource extends Resource
 {
     protected static ?string $model = Tanah::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedMap;
 
     protected static ?string $recordTitleAttribute = 'Data Tanah';
 
     protected static string | \UnitEnum | null $navigationGroup = 'Tanah';
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 12;
 
     protected static ?string $navigationLabel = 'Data Tanah';
 

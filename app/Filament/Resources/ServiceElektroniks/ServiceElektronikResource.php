@@ -26,7 +26,7 @@ class ServiceElektronikResource extends Resource
 
     protected static string | \UnitEnum | null $navigationGroup = 'Elektronik';
 
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 5;
 
     protected static ?string $navigationLabel = 'Service Elektronik';
 

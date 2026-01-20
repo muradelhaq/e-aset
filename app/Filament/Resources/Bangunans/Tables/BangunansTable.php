@@ -5,9 +5,12 @@ namespace App\Filament\Resources\Bangunans\Tables;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\RestoreAction;
+use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
+use Filament\Actions\DeleteAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
@@ -17,155 +20,110 @@ class BangunansTable
     public static function configure(Table $table): Table
     {
         return $table
-    ->columns([
+        ->columns([
+            /* =======================
+            * KOLOM UTAMA (TAMPIL)
+            * ======================= */
+            TextColumn::make('jenis_bangunan')
+                ->label('Jenis Bangunan')
+                ->searchable()
+                ->sortable(),
 
-        /* =======================
-         * IDENTITAS BANGUNAN
-         * ======================= */
-        TextColumn::make('kode_lokasi')
-            ->label('Kode Lokasi')
-            ->searchable()
-            ->sortable(),
+            TextColumn::make('kondisi_bangunan')
+                ->label('Kondisi')
+                ->badge()
+                ->color(fn (string $state): string => match ($state) {
+                    'Baik' => 'success',
+                    'Rusak Ringan' => 'info',     // Biru
+                    'Rusak Sedang' => 'warning',  // Oranye/Kuning
+                    'Rusak Berat' => 'danger',    // Merah
+                    default => 'gray',
+                }),
 
-        TextColumn::make('jenis_bangunan')
-            ->label('Jenis Bangunan')
-            ->searchable()
-            ->sortable(),
+            TextColumn::make('luas_lantai')
+                ->label('Luas (m²)')
+                ->numeric()
+                ->sortable(),
 
-        TextColumn::make('kode_bangunan')
-            ->label('Kode Bangunan')
-            ->searchable(),
+            TextColumn::make('harga')
+                ->label('Nilai Aset')
+                ->money('IDR')
+                ->sortable(),
 
-        TextColumn::make('register')
-            ->label('Register')
-            ->searchable(),
+            TextColumn::make('letak_alamat')
+                ->label('Alamat')
+                ->limit(30)
+                ->searchable(),
 
+            /* =======================
+            * KOLOM PENDUKUNG (HIDDEN BY DEFAULT)
+            * ======================= */
+            // Identitas
+            TextColumn::make('kode_lokasi')
+                ->label('Kode Lokasi')
+                ->toggleable(isToggledHiddenByDefault: true),
 
-        /* =======================
-         * KONDISI & STRUKTUR
-         * ======================= */
-        TextColumn::make('kondisi_bangunan')
-            ->label('Kondisi')
-            ->badge()
-            ->color(fn (string $state): string => match ($state) {
-                'Baik' => 'success',
-                'Rusak Ringan' => 'warning',
-                'Rusak Berat' => 'danger',
-                default => 'gray',
-            }),
+            TextColumn::make('kode_bangunan')
+                ->label('Kode Bangunan')
+                ->toggleable(isToggledHiddenByDefault: true),
 
-        TextColumn::make('bertingkat')
-            ->label('Bertingkat')
-            ->badge(),
+            TextColumn::make('register')
+                ->label('Register')
+                ->toggleable(isToggledHiddenByDefault: true),
 
-        TextColumn::make('beton')
-            ->label('Konstruksi Beton')
-            ->badge(),
+            // Struktur
+            TextColumn::make('bertingkat')
+                ->label('Bertingkat')
+                ->badge()
+                ->toggleable(isToggledHiddenByDefault: true),
 
+            TextColumn::make('beton')
+                ->label('Konstruksi Beton')
+                ->badge()
+                ->toggleable(isToggledHiddenByDefault: true),
 
-        /* =======================
-         * DIMENSI & LUAS
-         * ======================= */
-        TextColumn::make('luas_lantai')
-            ->label('Luas Lantai (m²)')
-            ->numeric()
-            ->sortable(),
+            // Detail Tanah
+            TextColumn::make('luas')
+                ->label('Luas Tanah')
+                ->toggleable(isToggledHiddenByDefault: true),
 
-        TextColumn::make('luas')
-            ->label('Luas Tanah (m²)')
-            ->numeric()
-            ->sortable(),
+            TextColumn::make('status_tanah')
+                ->label('Status Tanah')
+                ->toggleable(isToggledHiddenByDefault: true),
 
+            // Administrasi & Sistem
+            TextColumn::make('tanggal')
+                ->label('Tgl Perolehan')
+                ->date()
+                ->toggleable(isToggledHiddenByDefault: true),
 
-        /* =======================
-         * LOKASI & LEGALITAS
-         * ======================= */
-        TextColumn::make('letak_alamat')
-            ->label('Alamat')
-            ->limit(40)
-            ->tooltip(fn ($state) => $state)
-            ->searchable(),
+            TextColumn::make('pengurus_user')
+                ->label('Pengurus')
+                ->toggleable(isToggledHiddenByDefault: true),
 
-        TextColumn::make('status_tanah')
-            ->label('Status Tanah')
-            ->searchable(),
-
-        TextColumn::make('nomor_kode_tanah')
-            ->label('Kode Tanah')
-            ->searchable(),
-
-
-        /* =======================
-         * ADMINISTRASI
-         * ======================= */
-        TextColumn::make('nomor')
-            ->label('Nomor Dokumen')
-            ->searchable(),
-
-        TextColumn::make('asal_usul')
-            ->label('Asal Usul')
-            ->searchable(),
-
-        TextColumn::make('harga')
-            ->label('Nilai Aset')
-            ->money('IDR')
-            ->sortable(),
-
-        TextColumn::make('tanggal')
-            ->label('Tanggal Perolehan')
-            ->date('d M Y')
-            ->sortable(),
-
-
-        /* =======================
-         * MEDIA & PENGELOLA
-         * ======================= */
-        TextColumn::make('foto')
-            ->label('Foto')
-            ->toggleable(isToggledHiddenByDefault: true),
-
-        TextColumn::make('pengurus_user')
-            ->label('Pengurus')
-            ->searchable(),
-
-
-        /* =======================
-         * SISTEM
-         * ======================= */
-        TextColumn::make('deleted_at')
-            ->label('Dihapus')
-            ->dateTime()
-            ->sortable()
-            ->toggleable(isToggledHiddenByDefault: true),
-
-        TextColumn::make('created_at')
-            ->label('Dibuat')
-            ->dateTime()
-            ->sortable()
-            ->toggleable(isToggledHiddenByDefault: true),
-
-        TextColumn::make('updated_at')
-            ->label('Diperbarui')
-            ->dateTime()
-            ->sortable()
-            ->toggleable(isToggledHiddenByDefault: true),
-    ])
+            TextColumn::make('updated_at')
+                ->label('Terakhir Diupdate')
+                ->dateTime()
+                ->toggleable(isToggledHiddenByDefault: true),
+        ])
 
     ->filters([
         TrashedFilter::make(),
     ])
 
-    ->recordActions([
-        ViewAction::make(),
-        EditAction::make(),
-    ])
+                ->recordActions([
+                ViewAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
+                RestoreAction::make(),
+                ForceDeleteAction::make(),
+            ])
 
-    ->toolbarActions([
-        BulkActionGroup::make([
-            DeleteBulkAction::make(),
-            ForceDeleteBulkAction::make(),
-            RestoreBulkAction::make(),
-        ]),
-    ]);
-    }
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                    ForceDeleteBulkAction::make(),
+                    RestoreBulkAction::make(),
+                ]),
+            ]);}
 }

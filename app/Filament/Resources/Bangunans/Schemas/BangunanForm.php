@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Bangunans\Schemas;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload; // Untuk foto
 use Filament\Schemas\Components\Grid;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Schemas\Components\Section;
@@ -35,7 +36,17 @@ class BangunanForm
                             ->description('Detail teknis dan kondisi fisik bangunan.')
                             ->icon('heroicon-o-home')
                             ->schema([
-                                TextInput::make('kondisi_bangunan')->label('Kondisi Bangunan'),
+                                Select::make('kondisi_bangunan')
+                                ->label('Kondisi Bangunan')
+                                ->options([
+                                    'Baik' => 'Baik',
+                                    'Rusak Ringan' => 'Rusak Ringan',
+                                    'Rusak Sedang' => 'Rusak Sedang',
+                                    'Rusak Berat' => 'Rusak Berat',
+                                ])
+                                ->required()
+                                ->native(false)
+                                ->prefixIcon('heroicon-m-check-badge'), // Menambah icon untuk mempercantik UI
                                 TextInput::make('bertingkat')->label('Jumlah Lantai (Tingkat)'),
                                 TextInput::make('beton')->label('Konstruksi Beton'),
                                 TextInput::make('luas_lantai')->numeric()->label('Luas Lantai (m²)'),
@@ -64,7 +75,8 @@ class BangunanForm
                                 FileUpload::make('foto')
                                     ->label('Foto Bangunan')
                                     ->image()
-                                    ->directory('bangunan-photos')
+                                    ->disk('public')
+                                    ->directory('uploads/bangunan')
                                     ->columnSpanFull(),
                                 TextInput::make('pengurus_user')->label('Petugas Pengurus'),
                                 Textarea::make('ket')

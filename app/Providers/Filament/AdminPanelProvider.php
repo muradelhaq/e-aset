@@ -25,6 +25,9 @@ class AdminPanelProvider extends PanelProvider
     public function panel(Panel $panel): Panel
     {
         return $panel
+            ->brandName('E-Aset Kabupaten')
+            ->brandLogo(asset('images/logo.png')) // optional
+            ->brandLogoHeight('2rem')
             ->default()
             ->id('admin')
             ->path('admin')

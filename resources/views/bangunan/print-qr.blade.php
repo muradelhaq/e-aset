@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="utf-8">
-<title>Cetak QR - {{ $record->nopol ?? $qr->kode_qr }}</title>
+<title>Cetak QR - {{ $qr->kode_qr }}</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 
 <style>
@@ -97,19 +97,20 @@ html, body {
     margin-bottom: 2px;
 }
 
-.item span.label {
+.item .label {
     display: inline-block;
-    width: 36%;
+    width: 38%;
     font-weight: 600;
     color: #4b5563;
 }
 
-.item span.value {
+.item .value {
     font-weight: 700;
 }
 
 .upper {
     text-transform: uppercase;
+    font-style: italic;
 }
 
 /* ===== ACTION ===== */
@@ -150,7 +151,7 @@ button {
 
         <!-- KOP -->
         <div class="header">
-            <img src="{{ asset('storage/images/logo.png') }}" alt="Logo">
+            <img src="{{ asset('storage/images/logo.png') }}" alt="Logo Kabupaten Tasikmalaya">
             <div class="header-text">
                 <div class="title">Pemerintah Kabupaten Tasikmalaya</div>
                 <div class="subtitle">Sistem Informasi Manajemen Aset</div>
@@ -162,7 +163,7 @@ button {
 
             <!-- QR -->
             <div class="qr-box">
-                {!! QrCode::size(250)->margin(1)->generate(route('kendaraan.show',$qr->kode_qr)) !!}
+                {!! QrCode::size(250)->margin(1)->generate(route('bangunan.show',$qr->kode_qr)) !!}
             </div>
 
             <!-- INFO -->
@@ -170,23 +171,33 @@ button {
                 <div class="code">{{ $qr->kode_qr }}</div>
 
                 <div class="item">
-                    <span class="label">No. Seri</span>
-                    <span class="value">{{ $record->nopol }}</span>
+                    <span class="label">Kode</span>
+                    <span class="value">{{ $record->kode_bangunan }}</span>
+                </div>
+
+                <div class="item">
+                    <span class="label">Nama</span>
+                    <span class="value">{{ $record->nama_bangunan }}</span>
                 </div>
 
                 <div class="item">
                     <span class="label">Jenis</span>
-                    <span class="value">{{ $record->jenis_kendaraan }}</span>
+                    <span class="value">{{ $record->jenis_bangunan }}</span>
                 </div>
 
                 <div class="item">
-                    <span class="label">Merek</span>
-                    <span class="value">{{ $record->merk }}</span>
+                    <span class="label">Tahun</span>
+                    <span class="value">{{ $record->tahun_bangun ?? '-' }}</span>
+                </div>
+
+                <div class="item">
+                    <span class="label">Alamat</span>
+                    <span class="value">{{ $record->alamat }}</span>
                 </div>
 
                 <div class="item">
                     <span class="label">Kondisi</span>
-                    <span class="value upper">{{ $record->keterangan }}</span>
+                    <span class="value upper">{{ $record->kondisi }}</span>
                 </div>
 
                 <div class="item">

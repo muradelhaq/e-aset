@@ -66,4 +66,99 @@
             </div>
         </div>
     </div>
+
+    {{-- CHART SECTION --}}
+<div class="space-y-6 " style="padding: 1rem;">
+
+    {{-- Section Chart --}}
+    <div class="fi-section rounded-xl bg-white shadow-sm ring-1 ring-gray-950/5 dark:bg-gray-900 dark:ring-white/10"
+         style="padding: 1rem;">
+
+        <h2 style="font-size: 1.125rem; font-weight: 600;"
+            class="text-gray-950 dark:text-white mb-1">
+            Visualisasi Aset
+        </h2>
+
+        <p style="font-size: 0.75rem;"
+           class="text-gray-500 dark:text-gray-400 mb-4">
+            Perbandingan jumlah aset berdasarkan kategori.
+        </p>
+
+        {{-- Grid Chart --}}
+        <div style="
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+        ">
+
+            {{-- Donut Chart --}}
+            <div class="fi-section rounded-xl bg-white dark:bg-gray-900 ring-1 ring-gray-950/5 dark:ring-white/10"
+                 style="padding: 0.75rem; height: 260px;">
+                <canvas id="assetDonutChart"></canvas>
+            </div>
+
+            {{-- Bar Chart --}}
+            <div class="fi-section rounded-xl bg-white dark:bg-gray-900 ring-1 ring-gray-950/5 dark:ring-white/10"
+                 style="padding: 0.75rem; height: 260px;">
+                <canvas id="assetBarChart"></canvas>
+            </div>
+
+        </div>
+    </div>
+
 </div>
+
+
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const labels = @json($chartData['labels']);
+    const values = @json($chartData['values']);
+
+    new Chart(document.getElementById('assetDonutChart'), {
+        type: 'doughnut',
+        data: {
+            labels,
+            datasets: [{
+                data: values,
+                backgroundColor: ['#2563eb', '#16a34a', '#ca8a04', '#0891b2'],
+                borderWidth: 0,
+                cutout: '65%',
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { boxWidth: 10 }
+                }
+            }
+        }
+    });
+
+    new Chart(document.getElementById('assetBarChart'), {
+        type: 'bar',
+        data: {
+            labels,
+            datasets: [{
+                data: values,
+                backgroundColor: '#3b82f6',
+                borderRadius: 6,
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { precision: 0 }
+                }
+            },
+            plugins: {
+                legend: { display: false }
+            }
+        }
+    });
+</script>

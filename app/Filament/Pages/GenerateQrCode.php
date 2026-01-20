@@ -24,7 +24,7 @@ class GenerateQrCode extends Page implements HasTable
 
     protected static string | \UnitEnum | null $navigationGroup = 'Kendaraan';
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 9;
 
     protected static ?string $navigationLabel = 'Generate Kode QR';
 

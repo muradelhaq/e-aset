@@ -9,6 +9,8 @@ use Filament\Pages\Page;
 use Filament\Tables;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Concerns\InteractsWithTable;
+use Filament\Actions\Action;
+use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Builder;
 
 class PajakKendaraan extends Page implements HasTable
@@ -21,7 +23,7 @@ class PajakKendaraan extends Page implements HasTable
 
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-calendar-days';
 
-    protected static ?int $navigationSort = 5;
+    protected static ?int $navigationSort = 10;
 
     protected string $view = 'filament.pages.pajak-kendaraan';
 
@@ -104,15 +106,67 @@ class PajakKendaraan extends Page implements HasTable
     }
     public static function getNavigationBadge(): ?string
     {
-        return Kendaraan::query()
-        ->whereDate('tgl_pajak', '>=', Carbon::today())
-        ->whereDate('tgl_pajak', '<=', Carbon::today()->addDays(7))
-        ->count();
+        $today = Carbon::today();
 
+        $expired = Kendaraan::query()
+            ->whereDate('tgl_pajak', '<', $today)
+            ->count();
+
+        $willExpire = Kendaraan::query()
+            ->whereDate('tgl_pajak', '>=', $today)
+            ->whereDate('tgl_pajak', '<=', $today->copy()->addDays(14))
+            ->count();
+
+        $total = $expired + $willExpire;
+
+        return $total > 0 ? (string) $total : null;
     }
+
 
     public static function getNavigationBadgeColor(): ?string
     {
-        return 'danger';
+        $today = Carbon::today();
+
+        $expired = Kendaraan::query()
+            ->whereDate('tgl_pajak', '<', $today)
+            ->exists();
+
+        return $expired ? 'danger' : 'warning';
     }
+
+    protected function getTableActions(): array
+    {
+        return [
+            Action::make('perpanjang_pajak')
+                ->label('Perpanjang Pajak 1 Tahun')
+                ->icon('heroicon-o-arrow-path')
+                ->color('success')
+
+                // Hanya muncul jika pajak sudah jatuh tempo
+                ->visible(fn (Kendaraan $record) =>
+                    Carbon::parse($record->tgl_pajak)->isPast()
+                )
+
+                // Konfirmasi dulu
+                ->requiresConfirmation()
+                ->modalHeading('Perpanjang Pajak Kendaraan')
+                ->modalDescription('Apakah Anda yakin ingin memperpanjang pajak kendaraan ini selama 1 tahun?')
+                ->modalSubmitActionLabel('Ya, Perpanjang')
+
+                // Aksi utama
+                ->action(function (Kendaraan $record) {
+                    $record->update([
+                        'tgl_pajak' => Carbon::parse($record->tgl_pajak)->addYear(),
+                    ]);
+
+                    Notification::make()
+                        ->title('Pajak Berhasil Diperpanjang')
+                        ->body('Pajak kendaraan diperpanjang selama 1 tahun.')
+                        ->success()
+                        ->send();
+                }),
+        ];
+    }
+
+
 }
